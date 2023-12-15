@@ -13,7 +13,7 @@ class CustomerUserForm(forms.ModelForm):
 class CustomerForm(forms.ModelForm):
     class Meta:
         model=models.Customer
-        fields=['address','mobile','profile_pic']
+        fields=['address','mobile','profile_pic','customer_email']
 
 
 class MechanicUserForm(forms.ModelForm):

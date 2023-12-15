@@ -148,10 +148,19 @@ def update_customer_view(request,pk):
             user=userForm.save()
             user.set_password(user.password)
             user.save()
+            customer_email = customerForm.cleaned_data['customer_email']
+
             customerForm.save()
+            send_customer_update_email(customer_email)
             return redirect('admin-view-customer')
     return render(request,'vehicle/update_customer.html',context=mydict)
-
+def send_customer_update_email(customer_email):
+    subject = "Your Profile Updated"
+    message = "Your profile information has been successfully updated. Thank you for using our services!"
+    from_email = "rentapalliuttej@gmail.com"  # Update with your email address or email sending logic
+    
+    # Send the email
+    send_mail(subject, message, from_email, [customer_email])
 
 @login_required(login_url='adminlogin')
 def admin_add_customer_view(request):
@@ -202,8 +211,14 @@ def admin_mechanic_view(request):
 
 @login_required(login_url='adminlogin')
 def admin_approve_mechanic_view(request):
+    subject = request.POST.get("subject", "Request Approved")
+    message = request.POST.get("message", "Vechical request is approved by a Admin")
+    from_email = request.POST.get("from_email", "rentapalliuttej@gmail.com")
+    send_mail(subject, message, from_email, ["rentapalliuttej@gmail.com"])
     mechanics=models.Mechanic.objects.all().filter(status=False)
     return render(request,'vehicle/admin_approve_mechanic.html',{'mechanics':mechanics})
+from django.core.mail import BadHeaderError, send_mail
+from django.http import HttpResponse, HttpResponseRedirect
 
 @login_required(login_url='adminlogin')
 def approve_mechanic_view(request,pk):
@@ -215,6 +230,10 @@ def approve_mechanic_view(request,pk):
             mechanic.salary=mechanicSalary.cleaned_data['salary']
             mechanic.status=True
             mechanic.save()
+            subject = request.POST.get("subject", "Request Approved")
+            message = request.POST.get("message", "Vechical request is approved by a Admin")
+            from_email = request.POST.get("from_email", "rentapalliuttej@gmail.com")
+            send_mail(subject, message, from_email, ["rentapalliuttej@gmail.com"])
         else:
             print("form is invalid")
         return HttpResponseRedirect('/admin-approve-mechanic')
